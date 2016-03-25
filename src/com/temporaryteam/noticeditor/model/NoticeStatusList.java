@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 
 /**
  * Collection of notice statuses
- * @author Maximillian M.
+ * @author Max Balushkin
  */
 public class NoticeStatusList {
 	private static ArrayList<NoticeStatus> list;
@@ -32,7 +32,7 @@ public class NoticeStatusList {
 	 * Restores statuses to saved state
 	 */
 	public static void restore() {
-		list = mementoList;
+		list = new ArrayList<>(mementoList);
 		lastIndex = mementoLastIndex;
 	}
 	
@@ -53,7 +53,7 @@ public class NoticeStatusList {
 	 */
 	public static void add(String statusName, int statusCode) {
 		lastIndex = (lastIndex < statusCode) ? statusCode : lastIndex + 1;
-		NoticeStatus newStatus = new NoticeStatus(statusName, statusCode);
+		NoticeStatus newStatus = new NoticeStatus(statusName, lastIndex);
 		list.add(newStatus);
 	}
 	
@@ -70,6 +70,10 @@ public class NoticeStatusList {
 	 * @return Status
 	 */
 	public static NoticeStatus getStatus(int statusCode) {
+		if (list.isEmpty()) {
+			return null;
+		}
+		
 		NoticeStatus foo = list.stream().filter(status -> status.getCode() == statusCode).findFirst().orElse(list.get(0));
 		return foo;
 	}

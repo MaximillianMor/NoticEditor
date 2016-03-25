@@ -51,4 +51,19 @@ public class NoticeTreeItemTest {
 		assertEquals("test", leaf.getContent());
 	}
 	
+	@Test
+	public void testFiedTitle() {
+		NoticeTreeItem item = new NoticeTreeItem("foo");
+		assertEquals("foo", item.getTitle());
+		item.setTitle("bar");
+		assertEquals("bar", item.getTitle());
+	}
+	
+	@Test
+	public void testFiedStatus() {
+		NoticeTreeItem item = new NoticeTreeItem("foo", "content", 0);
+		assertEquals(0, item.getStatus());
+		item.setStatus(1);
+		assertEquals(1, item.getStatus());
+	}
 }

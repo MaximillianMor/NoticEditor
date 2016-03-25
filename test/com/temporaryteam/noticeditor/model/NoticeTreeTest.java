@@ -24,14 +24,33 @@ public class NoticeTreeTest {
 		tree.addItem(new NoticeTreeItem("branch"), null);
 		assertEquals(2, tree.getRoot().getInternalChildren().size());
 		
+		NoticeTreeItem leaf2 = new NoticeTreeItem("leaf2", "content");
+		tree.addItem(leaf2, leaf);
+		
 		tree.removeItem(leaf);
-		assertEquals(1, tree.getRoot().getInternalChildren().size());
+		assertEquals(2, tree.getRoot().getInternalChildren().size());
+	}
+	
+	@Test
+	public void testAddItem() {
+//		NoticeTreeItem root = new NoticeTreeItem("root");
+//		NoticeTree tree = new NoticeTree(root);
+//		
+//		NoticeTreeItem item = new NoticeTreeItem("foo", "bar");
+//		tree.addItem(new NoticeTreeItem("baz", "quux"), item);
 	}
 	
 	@Test
 	public void testRemoveRoot() {
-		NoticeTreeItem root = new NoticeTreeItem("branch");
-		NoticeTree tree = new NoticeTree(root);
+		NoticeTreeItem root = new NoticeTreeItem("branch");		
+		NoticeTree tree = new NoticeTree(null);
 		tree.removeItem(root);
+		
+		tree = new NoticeTree(root);
+		tree.removeItem(null);
+		assertEquals("branch", tree.getRoot().getTitle());
+		
+		tree.removeItem(root);
+		assertNotNull(tree.getRoot());
 	}
 }

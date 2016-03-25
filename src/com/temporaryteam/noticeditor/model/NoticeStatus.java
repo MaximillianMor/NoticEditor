@@ -2,7 +2,7 @@ package com.temporaryteam.noticeditor.model;
 
 /**
  * Representation of notice status
- * @author Maximillian M.
+ * @author Max Balushkin
  */
 public class NoticeStatus {
 	private String name;

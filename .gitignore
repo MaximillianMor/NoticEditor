@@ -4,3 +4,4 @@
 *.swp
 /nbproject/private/
 .gradle/
+.jacocoverage
