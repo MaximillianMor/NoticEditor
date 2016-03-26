@@ -16,18 +16,18 @@ import static org.junit.Assert.*;
  * TODO: Test with mock-objects cause of environment modifying
  */
 public class PrefsTest {
-	@Test
-	public void testLastDirectory() {
-		Prefs.setLastDirectory("C:\\");
-		assertEquals("C:\\", Prefs.getLastDirectory());
-	}
-
-	@Test
-	public void testRecentFiles() {
-//		List<String> current = Prefs.getRecentFiles();
-//		Prefs.addToRecentFiles("C:\\etc\\null\\tmp.json");
-//		List<String> recent = Prefs.getRecentFiles();
-//		recent.removeAll(current);
-//		assertEquals(1, recent.size());
-	}
+//	@Test
+//	public void testLastDirectory() {
+////		Prefs.setLastDirectory("C:\\");
+////		assertEquals("C:\\", Prefs.getLastDirectory());
+//	}
+//
+//	@Test
+//	public void testRecentFiles() {
+////		List<String> current = Prefs.getRecentFiles();
+////		Prefs.addToRecentFiles("C:\\etc\\null\\tmp.json");
+////		List<String> recent = Prefs.getRecentFiles();
+////		recent.removeAll(current);
+////		assertEquals(1, recent.size());
+//	}
 }

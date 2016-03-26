@@ -36,7 +36,6 @@ public class NoticeStatusListTest {
 		NoticeStatusList.add("foobar");
 		assertEquals(0, NoticeStatusList.getStatusCode("foobar"));
 		assertEquals("foobar", NoticeStatusList.getStatus(0).getName());
-		NoticeStatusList.restore();
 	}
 
 	@Test
@@ -44,34 +43,28 @@ public class NoticeStatusListTest {
 		NoticeStatusList.add("baz", 42);
 		assertEquals(42, NoticeStatusList.getStatusCode("baz"));
 		assertEquals("baz", NoticeStatusList.getStatus(42).getName());
-		NoticeStatusList.restore();
 	}
 	
 	@Test
 	public void testAdd_IfCustomIndexIsLesserReal() {
-		NoticeStatusList.save();
 		NoticeStatusList.add("foo", 42);
 		NoticeStatusList.add("bar", 2);
 		assertEquals(43, NoticeStatusList.getStatusCode("bar"));
-		NoticeStatusList.restore();
 	}
 
 	@Test
-	public void testGetStatusCodeIfThereIsNoSuchStatus() {
-		NoticeStatusList.restore();
+	public void testGetStatusCode_IfThereIsNoSuchStatus() {
 		assertEquals(0, NoticeStatusList.getStatusCode("abra"));		
-		NoticeStatusList.restore();
 	}
 
 	@Test
-	public void testGetStatus_IfThereNoSuchStatusCode() {		
-		NoticeStatusList.restore();
+	public void testGetStatus_IfThereIsNoSuchStatusCode() {		
 		assertNull(NoticeStatusList.getStatus(42));		
-		NoticeStatusList.restore();
 	}
 	
 	@Test
 	public void testMemento() {
+		NoticeStatusList.save();
 		NoticeStatusList.add("foobar", 42);
 		assertNotNull(NoticeStatusList.getStatus(42));
 		NoticeStatusList.restore();
@@ -82,15 +75,12 @@ public class NoticeStatusListTest {
 	public void testGetStatus_MustReturnZeroStatusCode() {
 		NoticeStatusList.add("default");
 		assertEquals(0, NoticeStatusList.getStatus(42).getCode());
-		NoticeStatusList.restore();
 	}
 	
 	@Test
 	public void testClear() {
-		NoticeStatusList.restore();
 		NoticeStatusList.add("foobar", 42);
 		NoticeStatusList.clear();
 		assertNull(NoticeStatusList.getStatus(42));
-		NoticeStatusList.restore();
 	}
 }

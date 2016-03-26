@@ -31,42 +31,6 @@ public class NoticeItemTest {
 		assertEquals("bar", item.getContent());
 		assertEquals(NoticeItem.STATUS_IMPORTANT, item.getStatus());
 	}
-	
-	@Test
-	public void testAddChild() {
-	}
-
-	@Test
-	public void testIsLeaf() {
-	}
-
-	@Test
-	public void testIsBranch() {
-	}
-
-	@Test
-	public void testGetContent() {
-	}
-
-	@Test
-	public void testChangeContent() {
-	}
-
-	@Test
-	public void testGetTitle() {
-	}
-
-	@Test
-	public void testSetTitle() {
-	}
-
-	@Test
-	public void testSetStatus() {
-	}
-
-	@Test
-	public void testGetStatus() {
-	}
 
 	@Test
 	public void testToString() {

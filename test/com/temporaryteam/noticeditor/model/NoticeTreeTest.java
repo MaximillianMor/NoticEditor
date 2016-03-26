@@ -30,16 +30,7 @@ public class NoticeTreeTest {
 		tree.removeItem(leaf);
 		assertEquals(2, tree.getRoot().getInternalChildren().size());
 	}
-	
-	@Test
-	public void testAddItem() {
-//		NoticeTreeItem root = new NoticeTreeItem("root");
-//		NoticeTree tree = new NoticeTree(root);
-//		
-//		NoticeTreeItem item = new NoticeTreeItem("foo", "bar");
-//		tree.addItem(new NoticeTreeItem("baz", "quux"), item);
-	}
-	
+
 	@Test
 	public void testRemoveRoot() {
 		NoticeTreeItem root = new NoticeTreeItem("branch");		
