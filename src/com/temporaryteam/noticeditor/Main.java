@@ -11,38 +11,30 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-	private Stage primaryStage;
-
 	@Override
-	public void start(Stage primaryStage) {
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("NoticEditor");
-		initRootLayout();
+	public void start(final Stage primaryStage) {
+//		this.primaryStage = primaryStage;
+		primaryStage.setTitle("NoticEditor");
+		initRootLayout(primaryStage);
 	}
 	
 	/**
 	 * Initializes root layout
+	 * @param primaryStage
 	 */
-	public void initRootLayout() {
+	public void initRootLayout(final Stage primaryStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Main.fxml"),
 					ResourceBundle.getBundle("resources.i18n.Language", Locale.getDefault()));
 			Scene scene = new Scene(loader.load());
 			primaryStage.setScene(scene);
 			NoticeController controller = (NoticeController) loader.getController();
-			controller.setApplication(this);
+			controller.setPrimaryStage(primaryStage);
 			primaryStage.setOnCloseRequest(controller::onExit);
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Returns primary stage
-	 */
-	public Stage getPrimaryStage() {
-		return primaryStage;
 	}
 
 	public static void main(String[] args) {

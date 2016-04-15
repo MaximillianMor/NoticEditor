@@ -1,7 +1,7 @@
 package com.temporaryteam.noticeditor.controller;
 
-import org.json.JSONException;
 
+import com.temporaryteam.noticeditor.controller.notifier.Notifier;
 import java.io.File;
 import java.io.IOException;
 
@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 
-import com.temporaryteam.noticeditor.Main;
 import com.temporaryteam.noticeditor.io.DocumentFormat;
 import com.temporaryteam.noticeditor.io.ExportException;
 import com.temporaryteam.noticeditor.io.ExportStrategy;
@@ -19,7 +18,7 @@ import com.temporaryteam.noticeditor.io.ExportStrategyHolder;
 import com.temporaryteam.noticeditor.io.importers.FileImporter;
 import com.temporaryteam.noticeditor.model.*;
 import com.temporaryteam.noticeditor.view.Chooser;
-import com.temporaryteam.noticeditor.view.Notification;
+import com.temporaryteam.noticeditor.view.NotificationBox;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -31,9 +30,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+/**
+ * Main window controller
+ * View: fxml/Main.fxml
+ * 
+ * MUST set primary stage before using?
+ */
 public class NoticeController {
 
-	private static final Logger logger = Logger.getLogger(NoticeController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NoticeController.class.getName());
 
 	@FXML
 	private VBox noticeTreeView;
@@ -64,35 +69,55 @@ public class NoticeController {
 	private ResourceBundle resources;
 
 	private static NoticeController instance;
-	private Main main;
+	private Stage primaryStage;
+	
 	private File fileSaved;
 
 	public NoticeController() {
 		instance = this;
 	}
-
-	public void setApplication(Main main) {
-		this.main = main;
+	
+	/**
+	 * Sets primary stage
+	 * 
+	 * @param aPrimaryStage Primary stage
+	 */
+	public void setPrimaryStage(Stage aPrimaryStage) {
+		primaryStage = aPrimaryStage;
 	}
 	
+	/**
+	 * Returns instance of this class
+	 * 
+	 * @return Instance
+	 */
 	public static NoticeController getController() {
 		return instance;
 	}
-
+	
+	/**
+	 * Returns controller of notice editor (and preview)
+	 * 
+	 * @return Controller of NoticeView
+	 */
 	public static NoticeViewController getNoticeViewController() {
 		return instance.noticeViewController;
 	}
 
+	/**
+	 * Returns controller of notice tree (left panel, without search and status)
+	 * @return 
+	 */
 	public static NoticeTreeViewController getNoticeTreeViewController() {
 		return instance.noticeTreeViewController;
 	}
-
+	
 	/**
 	 * Initializes the controller class.
 	 */
 	@FXML
 	private void initialize() {
-		Notification.init(notificationBox, notificationLabel);
+		Notifier.register(new NotificationBox(notificationBox, notificationLabel));
 		// Restore initial directory
 		File initialDirectory = new File(Prefs.getLastDirectory());
 		if (initialDirectory.isDirectory() && initialDirectory.exists()) {
@@ -148,7 +173,7 @@ public class NoticeController {
 		fileSaved = Chooser.file().open()
 				.filter(Chooser.SUPPORTED, Chooser.ALL)
 				.title("Open notice")
-				.show(main.getPrimaryStage());
+				.show(primaryStage);
 		if (fileSaved != null) {
 			openDocument(fileSaved);
 			Prefs.addToRecentFiles(fileSaved.getAbsolutePath());
@@ -160,8 +185,8 @@ public class NoticeController {
 		try {
 			noticeTreeViewController.rebuildTree(DocumentFormat.open(file));
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, null, e);
-			Notification.error("Unable to open " + fileSaved.getName());
+			LOGGER.log(Level.SEVERE, null, e);
+			Notifier.error("Unable to open " + fileSaved.getName());
 		}
 	}
 
@@ -179,7 +204,7 @@ public class NoticeController {
 		fileSaved = Chooser.file().save()
 				.filter(Chooser.ZIP, Chooser.JSON)
 				.title("Save notice")
-				.show(main.getPrimaryStage());
+				.show(primaryStage);
 		if (fileSaved == null) {
 			return;
 		}
@@ -197,10 +222,10 @@ public class NoticeController {
 		}
 		try {
 			DocumentFormat.save(file, noticeTreeViewController.getNoticeTree(), strategy);
-			Notification.success("Successfully saved!");
+			Notifier.success("Successfully saved!");
 		} catch (ExportException e) {
-			logger.log(Level.SEVERE, null, e);
-			Notification.error("Successfully failed!");
+			LOGGER.log(Level.SEVERE, null, e);
+			Notifier.error("Successfully failed!");
 		}
 		
 	}
@@ -209,7 +234,7 @@ public class NoticeController {
 	private void handleExportHtml(ActionEvent event) {
 		File destDir = Chooser.directory()
 				.title("Select directory to save HTML files")
-				.show(main.getPrimaryStage());
+				.show(primaryStage);
 		if (destDir == null) {
 			return;
 		}
@@ -217,10 +242,10 @@ public class NoticeController {
 		try {
 			ExportStrategyHolder.HTML.setProcessor(noticeViewController.processor);
 			ExportStrategyHolder.HTML.export(destDir, noticeTreeViewController.getNoticeTree());
-			Notification.success("Export success!");
+			Notifier.success("Export success!");
 		} catch (ExportException e) {
-			logger.log(Level.SEVERE, null, e);
-			Notification.error("Export failed!");
+			LOGGER.log(Level.SEVERE, null, e);
+			Notifier.error("Export failed!");
 		}
 	}
 
@@ -237,7 +262,7 @@ public class NoticeController {
 
 	@FXML
 	private void handleAbout(ActionEvent event) {
-		Notification.show("NoticEditor\n==========\n\nhttps://github.com/TemporaryTeam/NoticEditor");
+		Notifier.message("NoticEditor\n==========\n\nhttps://github.com/TemporaryTeam/NoticEditor");
 	}
 	
 	@FXML
@@ -247,7 +272,7 @@ public class NoticeController {
 			
 			Stage stage = new Stage();
 			stage.setTitle(resource.getString("import"));
-			stage.initOwner(main.getPrimaryStage());
+			stage.initOwner(primaryStage);
 			stage.initModality(Modality.WINDOW_MODAL);
 			
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WebImport.fxml"), resource);
@@ -256,7 +281,7 @@ public class NoticeController {
 			WebImportController controller = (WebImportController) loader.getController();
 			controller.setImportCallback((html, ex) -> {
 				if (ex != null) {
-					Notification.error(ex.toString());
+					Notifier.error(ex.toString());
 				} else if (html != null) {
 					noticeViewController.getEditor().setText(html);
 				}
@@ -264,7 +289,7 @@ public class NoticeController {
 			});
 			stage.show();
 		} catch(Exception e) {
-			logger.log(Level.SEVERE, null, e);
+			LOGGER.log(Level.SEVERE, null, e);
 		}
 	}
 
@@ -273,12 +298,12 @@ public class NoticeController {
 		File file = Chooser.file().open()
 				.filter(Chooser.SUPPORTED, Chooser.ALL)
 				.title("Import file")
-				.show(main.getPrimaryStage());
+				.show(primaryStage);
 		if (file == null) return;
 
 		FileImporter.content().importFrom(file, null, (text, ex) -> {
 			if (ex != null) {
-				Notification.error(ex.toString());
+				Notifier.error(ex.toString());
 			} else if (text != null) {
 				noticeViewController.getEditor().setText(text);
 			}

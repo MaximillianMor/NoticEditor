@@ -1,8 +1,9 @@
 package com.temporaryteam.noticeditor.controller;
 
+import com.temporaryteam.noticeditor.controller.notifier.Notifier;
 import com.temporaryteam.noticeditor.model.*;
 import com.temporaryteam.noticeditor.view.EditNoticeTreeCell;
-import com.temporaryteam.noticeditor.view.Notification;
+import com.temporaryteam.noticeditor.view.NotificationBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
@@ -205,7 +206,7 @@ public class NoticeTreeViewController implements Initializable {
 
 	@FXML
 	private void handleSearch(ActionEvent event) {
-		Notification.error("Sorry, search is not implemented yet.");
+		Notifier.error("Sorry, search is not implemented yet.");
 	}
 
 	@FXML
