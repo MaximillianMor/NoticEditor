@@ -5,7 +5,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
 
 /**
- *
+ * Directory selector
+ * 
  * @author Max Balushkin
  */
 public class DirectorySelectorDialog implements SelectorDialog {
@@ -15,6 +16,11 @@ public class DirectorySelectorDialog implements SelectorDialog {
 	
 	private File selectedDirectory;
 	
+	/**
+	 * Creates new directory selector
+	 * 
+	 * @param aOwnerWindow Dialog parent
+	 */
 	public DirectorySelectorDialog(Window aOwnerWindow) {
 		directoryChooser = new DirectoryChooser();
 		ownerWindow = aOwnerWindow;

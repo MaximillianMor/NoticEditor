@@ -23,6 +23,16 @@ public class SelectorDialogService {
 	}
 	
 	/**
+	 * Registers new selector without type inference
+	 * 
+	 * @param service Selector
+	 * @param serviceType Selector type
+	 */
+	public static void register(SelectorDialog service, Class serviceType) {
+		services.put(serviceType, service);
+	}
+	
+	/**
 	 * Provides selector
 	 * @param <T> Selector type
 	 * @param selectorClass Selector type
@@ -30,7 +40,6 @@ public class SelectorDialogService {
 	 */
 	public static <T extends SelectorDialog> T get(Class<T> selectorClass) {
 		T service = (T) services.get(selectorClass);
-		service.setTitle("Ok");
 		return service;
 	}
 	

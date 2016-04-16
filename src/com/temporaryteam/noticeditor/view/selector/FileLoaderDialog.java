@@ -3,11 +3,17 @@ package com.temporaryteam.noticeditor.view.selector;
 import javafx.stage.Window;
 
 /**
- *
+ * File loading dialog
+ * 
  * @author Max Balushkin
  */
 public class FileLoaderDialog extends FileSelectorDialog {
 
+	/**
+	 * Creates new file loading dialog
+	 * 
+	 * @param aOwnerWindow Dialog parent
+	 */
 	public FileLoaderDialog(Window aOwnerWindow) {
 		super(aOwnerWindow);
 	}
