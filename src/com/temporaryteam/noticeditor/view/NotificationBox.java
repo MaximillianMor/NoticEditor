@@ -18,13 +18,13 @@ import javafx.util.Duration;
  */
 public class NotificationBox implements Notifiable {
 	
-	public static final Duration DURATION_SHORT = new Duration(2000);
-	public static final Duration DURATION_LONG = new Duration(5000);
+	public final Duration DURATION_SHORT = new Duration(2000);
+	public final Duration DURATION_LONG = new Duration(5000);
 	
-	private static final Duration TRANSITION_DURATION = new Duration(300);
-	private static final Paint PAINT_MESSAGE = Color.WHITE;
-	private static final Paint PAINT_ERROR = Color.rgb(255, 80, 80);
-	private static final Paint PAINT_SUCCESS = Color.LIGHTGREEN;
+	private final Duration TRANSITION_DURATION = new Duration(300);
+	private final Paint PAINT_MESSAGE = Color.WHITE;
+	private final Paint PAINT_ERROR = Color.rgb(255, 80, 80);
+	private final Paint PAINT_SUCCESS = Color.LIGHTGREEN;
 
 	private final VBox notificationBox;
 	private final Label notificationLabel;
@@ -54,9 +54,6 @@ public class NotificationBox implements Notifiable {
 		message(text, DURATION_SHORT);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void message(String text, Duration duration) {
 		message(text, duration, PAINT_MESSAGE);

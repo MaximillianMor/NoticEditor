@@ -1,0 +1,50 @@
+package com.temporaryteam.noticeditor.view.selector;
+
+import java.io.File;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
+
+/**
+ *
+ * @author Max Balushkin
+ */
+public class DirectorySelectorDialog implements SelectorDialog {
+
+	private final DirectoryChooser directoryChooser;
+	private final Window ownerWindow;
+	
+	private File selectedDirectory;
+	
+	public DirectorySelectorDialog(Window aOwnerWindow) {
+		directoryChooser = new DirectoryChooser();
+		ownerWindow = aOwnerWindow;
+	}
+	
+	@Override
+	public void setTitle(String string) {
+		directoryChooser.setTitle(string);
+	}
+
+	@Override
+	public void setInitialDirectory(File initialDirectory) {
+		directoryChooser.setInitialDirectory(initialDirectory);
+	}
+
+	@Override
+	public SelectorDialog show(String title) {
+		setTitle(title);
+		selectedDirectory = directoryChooser.showDialog(ownerWindow);
+		
+		if (selectedDirectory != null) {
+			SelectorDialogService.setLastDirectory(selectedDirectory);
+		}
+		
+		return this;
+	}
+
+	@Override
+	public File result() {
+		return selectedDirectory;
+	}
+	
+}

@@ -1,6 +1,5 @@
 package com.temporaryteam.noticeditor.controller;
 
-
 import com.temporaryteam.noticeditor.controller.notifier.Notifier;
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +16,8 @@ import com.temporaryteam.noticeditor.io.ExportStrategy;
 import com.temporaryteam.noticeditor.io.ExportStrategyHolder;
 import com.temporaryteam.noticeditor.io.importers.FileImporter;
 import com.temporaryteam.noticeditor.model.*;
-import com.temporaryteam.noticeditor.view.Chooser;
 import com.temporaryteam.noticeditor.view.NotificationBox;
+import com.temporaryteam.noticeditor.view.selector.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -121,7 +120,7 @@ public class NoticeController {
 		// Restore initial directory
 		File initialDirectory = new File(Prefs.getLastDirectory());
 		if (initialDirectory.isDirectory() && initialDirectory.exists()) {
-			Chooser.setInitialDirectory(initialDirectory);
+			SelectorDialogService.setInitialDirectory(initialDirectory);
 		}
 		rebuildRecentFilesMenu();
 				
@@ -170,10 +169,12 @@ public class NoticeController {
 
 	@FXML
 	private void handleOpen(ActionEvent event) {
-		fileSaved = Chooser.file().open()
-				.filter(Chooser.SUPPORTED, Chooser.ALL)
-				.title("Open notice")
-				.show(primaryStage);
+		fileSaved = SelectorDialogService.get(FileLoaderDialog.class)
+//		fileSaved = SelectorDialogService.fileLoader()
+			.filter(FileSelectorDialog.SUPPORTED, FileSelectorDialog.ALL)
+			.show("Open notice")
+			.result();
+		
 		if (fileSaved != null) {
 			openDocument(fileSaved);
 			Prefs.addToRecentFiles(fileSaved.getAbsolutePath());
@@ -201,10 +202,11 @@ public class NoticeController {
 
 	@FXML
 	private void handleSaveAs(ActionEvent event) {
-		fileSaved = Chooser.file().save()
-				.filter(Chooser.ZIP, Chooser.JSON)
-				.title("Save notice")
-				.show(primaryStage);
+		fileSaved = SelectorDialogService.get(FileSaverDialog.class)
+//		fileSaved = SelectorDialogService.fileSaver()
+			.filter(FileSelectorDialog.ZIP, FileSelectorDialog.JSON)
+			.show("Save notice")
+			.result();
 		if (fileSaved == null) {
 			return;
 		}
@@ -214,12 +216,17 @@ public class NoticeController {
 
 	private void saveDocument(File file) {
 		ExportStrategy strategy;
-		if (Chooser.JSON.equals(Chooser.getLastSelectedExtensionFilter())
-				|| file.getName().toLowerCase().endsWith(".json")) {
+		boolean isJson = 
+			SelectorDialogService.get(FileSaverDialog.class)
+				.getLastExtension().equals(FileSelectorDialog.JSON)
+//			SelectorDialogService.fileSaver().getLastExtension().equals(FileSelectorDialog.JSON)
+			|| file.getName().toLowerCase().endsWith(".json");
+		if (isJson) {
 			strategy = ExportStrategyHolder.JSON;
 		} else {
 			strategy = ExportStrategyHolder.ZIP;
 		}
+		
 		try {
 			DocumentFormat.save(file, noticeTreeViewController.getNoticeTree(), strategy);
 			Notifier.success("Successfully saved!");
@@ -232,9 +239,10 @@ public class NoticeController {
 
 	@FXML
 	private void handleExportHtml(ActionEvent event) {
-		File destDir = Chooser.directory()
-				.title("Select directory to save HTML files")
-				.show(primaryStage);
+		File destDir = SelectorDialogService.get(DirectorySelectorDialog.class)
+//		File destDir = SelectorDialogService.directorySelector()
+			.show("Select directory to save HTML files")
+			.result();
 		if (destDir == null) {
 			return;
 		}
@@ -295,10 +303,11 @@ public class NoticeController {
 
 	@FXML
 	private void handleImportFile(ActionEvent event) {
-		File file = Chooser.file().open()
-				.filter(Chooser.SUPPORTED, Chooser.ALL)
-				.title("Import file")
-				.show(primaryStage);
+		File file = SelectorDialogService.get(FileLoaderDialog.class)
+//		File file = SelectorDialogService.fileLoader()
+			.filter(FileSelectorDialog.SUPPORTED, FileSelectorDialog.ALL)
+			.show("Import file")
+			.result();
 		if (file == null) return;
 
 		FileImporter.content().importFrom(file, null, (text, ex) -> {
@@ -311,6 +320,6 @@ public class NoticeController {
 	}
 
 	public void onExit(WindowEvent we) {
-		Prefs.setLastDirectory(Chooser.getLastDirectory().getAbsolutePath());
+		Prefs.setLastDirectory(SelectorDialogService.getLastDirectory().getAbsolutePath());
 	}
 }

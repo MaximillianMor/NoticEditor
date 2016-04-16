@@ -1,0 +1,67 @@
+package com.temporaryteam.noticeditor.view.selector;
+
+import java.io.File;
+import java.util.HashMap;
+
+/**
+ * Providing selectors (file saving, file loading, directory selecting) service
+ * 
+ * @author Max Balushkin
+ */
+public class SelectorDialogService {
+	
+	private static final HashMap<Class, SelectorDialog> services = new HashMap<>();
+	
+	/**
+	 * Registers new selector
+	 * 
+	 * @param <T> Selector type
+	 * @param service Selector
+	 */
+	public static <T extends SelectorDialog> void register(T service) {
+		services.put(service.getClass(), service);
+	}
+	
+	/**
+	 * Provides selector
+	 * @param <T> Selector type
+	 * @param selectorClass Selector type
+	 * @return Selector
+	 */
+	public static <T extends SelectorDialog> T get(Class<T> selectorClass) {
+		T service = (T) services.get(selectorClass);
+		service.setTitle("Ok");
+		return service;
+	}
+	
+	private static File lastDirectory;
+
+	/**
+	 * Sets last selected directory
+	 * 
+	 * @param aLastDirectory 
+	 */
+	public static void setLastDirectory(File aLastDirectory) {
+		lastDirectory = aLastDirectory;
+	}
+	
+	/**
+	 * Returns last selected directory
+	 * 
+	 * @return Last selected directory
+	 */
+	public static File getLastDirectory() {
+		return lastDirectory;
+	}
+	
+	/**
+	 * Sets initial directory for every selector
+	 * 
+	 * @param initialDirectory Directory
+	 */
+	public static void setInitialDirectory(final File initialDirectory) {
+		for (SelectorDialog selector : services.values()) {
+			selector.setInitialDirectory(lastDirectory);
+		}
+	}
+}
