@@ -2,7 +2,7 @@ package com.temporaryteam.noticeditor.model;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-import com.temporaryteam.noticeditor.io.JsonFormat;
+//import com.temporaryteam.noticeditor.io.OldJsonFormat;
 import org.json.JSONException;
 import org.junit.*;
 import org.junit.rules.TestRule;
@@ -30,6 +30,6 @@ public class NoticeTreeItemBenchmarksTest {
 	@Ignore
 	@Test
 	public void testJsonExport() throws JSONException {
-		JsonFormat.with(null).export(root);
+//		OldJsonFormat.with(null).export(root);
 	}
 }

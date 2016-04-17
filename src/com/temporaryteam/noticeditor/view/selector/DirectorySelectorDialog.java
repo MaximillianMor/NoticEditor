@@ -1,5 +1,7 @@
 package com.temporaryteam.noticeditor.view.selector;
 
+import com.temporaryteam.noticeditor.io.FileIO;
+import com.temporaryteam.noticeditor.io.IO;
 import java.io.File;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
@@ -48,9 +50,17 @@ public class DirectorySelectorDialog implements SelectorDialog {
 		return this;
 	}
 
+	/**
+	 * @deprecated  
+	 */
 	@Override
 	public File result() {
 		return selectedDirectory;
+	}
+	
+	@Override
+	public IO io() {
+		return new FileIO(selectedDirectory);
 	}
 	
 }

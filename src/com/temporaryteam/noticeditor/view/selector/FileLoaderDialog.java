@@ -1,5 +1,6 @@
 package com.temporaryteam.noticeditor.view.selector;
 
+import java.io.File;
 import javafx.stage.Window;
 
 /**
@@ -25,7 +26,8 @@ public class FileLoaderDialog extends FileSelectorDialog {
 		lastFilter = fileChooser.getSelectedExtensionFilter();
 		
 		if (selectedFile != null) {
-			SelectorDialogService.setLastDirectory(selectedFile.getParentFile());
+			File parent = selectedFile.getParentFile();
+			SelectorDialogService.setLastDirectory(parent);
 		}
 		
 		return this;

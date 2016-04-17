@@ -3,15 +3,12 @@ package com.temporaryteam.noticeditor.io;
 import gcardone.junidecode.Junidecode;
 import java.io.*;
 import java.net.URLEncoder;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public final class IOUtil {
 	
-	private static final int FILENAME_LIMIT = 60;
-	private static final String NEW_LINE = System.lineSeparator();
+	public static final int FILENAME_LIMIT = 60;
+	public static final String NEW_LINE = System.lineSeparator();
 
-	// JsonFormat:29
 	// FilImporter:[42, 52]
 	public static String readContent(File file) throws IOException {
 		return stringFromStream(new FileInputStream(file));
@@ -25,21 +22,13 @@ public final class IOUtil {
 		}
 	}
 	
-	// JsonFormat:62
-	public static void writeJson(File file, JSONObject json) throws IOException, JSONException {
-		try (OutputStream os = new FileOutputStream(file);
-				Writer writer = new OutputStreamWriter(os, "UTF-8")) {
-			json.write(writer);
-		}
-	}
-	
-	// no
+	// no usage
 	public static void removeDirectory(File directory) {
 		if (directory.isFile() || !directory.exists()) return;
 		removeDirectoryHelper(directory);
 	}
 	
-	// IOUtil:[no, rec no]
+	// self:[30 (no usage), 37 (recursive)]
 	private static void removeDirectoryHelper(File file) {
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
@@ -49,8 +38,13 @@ public final class IOUtil {
 		file.delete();
 	}
 	
-	// HtmlExportStrategy:110
-	// ZipWithIndexFormat:109
+	/**
+	 * Sanitizes filename - transliterates and trims
+	 * 
+	 * @param name Sanitizing name
+	 * @return Sanitized name, 
+	 * if name was <code>null</code> - "empty"
+	 */
 	public static String sanitizeFilename(String name) {
 		if (name == null || name.isEmpty()) return "empty";
 		
@@ -80,14 +74,13 @@ public final class IOUtil {
 		return new ByteArrayInputStream(content.getBytes(charset));
 	}
 	
-	// self:17
-	// ZipWithIndexFormat:61
+	// self:16
 	// WebImporter:24
 	public static String stringFromStream(InputStream stream) throws IOException {
 		return stringFromStream(stream, "UTF-8");
 	}
 	
-	// seld:87
+	// self:83
 	public static String stringFromStream(InputStream stream, String charset) throws IOException {
 		final StringBuilder result = new StringBuilder();
 		try (Reader isr = new InputStreamReader(stream, charset);
@@ -100,7 +93,12 @@ public final class IOUtil {
 		return result.toString();
 	}
 	
-	// SyntaxHighlighter:83
+	/**
+	 * Copies content of stream to stream
+	 * @param is Input
+	 * @param os Output
+	 * @throws IOException 
+	 */
 	public static void copy(InputStream is, OutputStream os) throws IOException {
 		final int bufferSize = 4096;
 		final byte[] buffer = new byte[bufferSize];

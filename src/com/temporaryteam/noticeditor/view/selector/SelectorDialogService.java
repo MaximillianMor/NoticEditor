@@ -39,8 +39,7 @@ public class SelectorDialogService {
 	 * @return Selector
 	 */
 	public static <T extends SelectorDialog> T get(Class<T> selectorClass) {
-		T service = (T) services.get(selectorClass);
-		return service;
+		return (T) services.get(selectorClass);
 	}
 	
 	private static File lastDirectory;

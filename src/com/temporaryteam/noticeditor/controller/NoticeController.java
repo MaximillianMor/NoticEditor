@@ -1,6 +1,10 @@
 package com.temporaryteam.noticeditor.controller;
 
 import com.temporaryteam.noticeditor.controller.notifier.Notifier;
+import com.temporaryteam.noticeditor.io.*;
+import com.temporaryteam.noticeditor.io.format.Format;
+import com.temporaryteam.noticeditor.io.format.FormatException;
+import com.temporaryteam.noticeditor.io.format.FormatService;
 import java.io.File;
 import java.io.IOException;
 
@@ -10,10 +14,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 
-import com.temporaryteam.noticeditor.io.DocumentFormat;
-import com.temporaryteam.noticeditor.io.ExportException;
-import com.temporaryteam.noticeditor.io.ExportStrategy;
-import com.temporaryteam.noticeditor.io.ExportStrategyHolder;
 import com.temporaryteam.noticeditor.io.importers.FileImporter;
 import com.temporaryteam.noticeditor.model.*;
 import com.temporaryteam.noticeditor.view.NotificationBox;
@@ -68,7 +68,8 @@ public class NoticeController {
 	private static NoticeController instance;
 	private Stage primaryStage;
 	
-	private File fileSaved;
+//	private File fileSaved;
+	private IO lastDatasource;
 
 	public NoticeController() {
 		instance = this;
@@ -154,8 +155,9 @@ public class NoticeController {
 				.forEach(file -> {
 					MenuItem item = new MenuItem(file.getAbsolutePath());
 					item.setOnAction(e -> {
-						fileSaved = file;
-						openDocument(file);
+						FileIO io = new FileIO(file);
+						lastDatasource = io;
+						openDocument(io);
 					});
 					recentFilesMenu.getItems().add(item);
 				});
@@ -165,77 +167,72 @@ public class NoticeController {
 	@FXML
 	private void handleNew(ActionEvent event) {
 		noticeTreeViewController.rebuildTree(resources.getString("help"));
-		fileSaved = null;
+		lastDatasource = null;
 		NoticeStatusList.restore();
 	}
 
 	@FXML
 	private void handleOpen(ActionEvent event) {
-		fileSaved = SelectorDialogService.get(FileLoaderDialog.class)
+		FileIO io = (FileIO) SelectorDialogService.get(FileLoaderDialog.class)
 			.filter(FileSelectorDialog.SUPPORTED, FileSelectorDialog.ALL)
 			.show("Open notice")
-			.result();
+			.io();
 		
-		if (fileSaved != null) {
-			openDocument(fileSaved);
-			Prefs.addToRecentFiles(fileSaved.getAbsolutePath());
+		if (io.isAvailable()) {
+			openDocument(io);
+			Prefs.addToRecentFiles(io.getPath());
 			rebuildRecentFilesMenu();
 		}
 	}
 	
-	private void openDocument(File file) {
+	private void openDocument(IO io) {
 		try {
-			noticeTreeViewController.rebuildTree(DocumentFormat.open(file));
-		} catch (IOException e) {
+			NoticeTree tree = DocumentFormat.open(io);
+			noticeTreeViewController.rebuildTree(tree);
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, null, e);
-			Notifier.error("Unable to open " + fileSaved.getName());
+			Notifier.error("Unable to open " + io.getDatasourceName());
 		}
 	}
 
 	@FXML
 	private void handleSave(ActionEvent event) {
-		if (fileSaved == null) {
+		if (lastDatasource == null) {
 			handleSaveAs(event);
 		} else {
-			saveDocument(fileSaved);
+			saveDocument(lastDatasource);
 		}
 	}
 
 	@FXML
 	private void handleSaveAs(ActionEvent event) {
-		fileSaved = SelectorDialogService.get(FileSaverDialog.class)
+		FileIO io = (FileIO) SelectorDialogService.get(FileSaverDialog.class)
 			.filter(FileSelectorDialog.ZIP, FileSelectorDialog.JSON)
 			.show("Save notice")
-			.result();
-		if (fileSaved == null) {
-			return;
-		}
+			.io();
 
-		saveDocument(fileSaved);
+		if (io.isAvailable()) {
+			saveDocument(io);
+		}
 	}
 
-	private void saveDocument(File file) {
-		ExportStrategy strategy;
-		boolean isJson = 
-			SelectorDialogService.get(FileSaverDialog.class)
-				.getLastExtension().equals(FileSelectorDialog.JSON)
-			|| file.getName().toLowerCase().endsWith(".json");
-		if (isJson) {
-			strategy = ExportStrategyHolder.JSON;
-		} else {
-			strategy = ExportStrategyHolder.ZIP;
-		}
-		
+	private void saveDocument(IO io) {
 		try {
-			DocumentFormat.save(file, noticeTreeViewController.getNoticeTree(), strategy);
+			Format fmt = FormatService.get("json");
+			if (io.getDatasourceName().toLowerCase().endsWith(".zip")) {
+				fmt = FormatService.get("zip");
+			}
+			
+			NoticeTree tree = noticeTreeViewController.getNoticeTree();
+			DocumentFormat.save(io, tree, fmt);
 			Notifier.success("Successfully saved!");
-		} catch (ExportException e) {
-			LOGGER.log(Level.SEVERE, null, e);
-			Notifier.error("Successfully failed!");
+		} catch (FormatException | IOException ex) {
+			LOGGER.log(Level.SEVERE, null, ex);
+			Notifier.error("Failed...");
 		}
-		
 	}
-
+	
+	// TODO: change File to FileIO
 	@FXML
 	private void handleExportHtml(ActionEvent event) {
 		File destDir = SelectorDialogService.get(DirectorySelectorDialog.class)
@@ -246,8 +243,8 @@ public class NoticeController {
 		}
 
 		try {
-			ExportStrategyHolder.HTML.setProcessor(noticeViewController.processor);
-			ExportStrategyHolder.HTML.export(destDir, noticeTreeViewController.getNoticeTree());
+			FormatService.HTML.setProcessor(noticeViewController.processor);
+			FormatService.HTML.export(destDir, noticeTreeViewController.getNoticeTree());
 			Notifier.success("Export success!");
 		} catch (ExportException e) {
 			LOGGER.log(Level.SEVERE, null, e);
@@ -299,6 +296,7 @@ public class NoticeController {
 		}
 	}
 
+	// TODO: change File to FileIO
 	@FXML
 	private void handleImportFile(ActionEvent event) {
 		File file = SelectorDialogService.get(FileLoaderDialog.class)

@@ -1,6 +1,9 @@
 package com.temporaryteam.noticeditor;
 
 import com.temporaryteam.noticeditor.controller.NoticeController;
+import com.temporaryteam.noticeditor.io.format.FormatService;
+import com.temporaryteam.noticeditor.io.format.JsonFormat;
+import com.temporaryteam.noticeditor.io.format.ZipWithIndexFormat;
 import com.temporaryteam.noticeditor.view.selector.DirectorySelectorDialog;
 import com.temporaryteam.noticeditor.view.selector.FileLoaderDialog;
 import com.temporaryteam.noticeditor.view.selector.FileSaverDialog;
@@ -20,6 +23,7 @@ public class Main extends Application {
 	public void start(final Stage primaryStage) {
 		primaryStage.setTitle("NoticEditor");
 		registerSelectors(primaryStage);
+		registerFormats();
 		initRootLayout(primaryStage);
 	}
 	
@@ -31,6 +35,14 @@ public class Main extends Application {
 		SelectorDialogService.register(new DirectorySelectorDialog(primaryStage));
 		SelectorDialogService.register(new FileLoaderDialog(primaryStage));
 		SelectorDialogService.register(new FileSaverDialog(primaryStage));
+	}
+	
+	/**
+	 * Register file formats
+	 */
+	private void registerFormats() {
+		FormatService.register("json", new JsonFormat());
+		FormatService.register("zip", new ZipWithIndexFormat());
 	}
 	
 	/**

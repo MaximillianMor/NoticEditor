@@ -1,5 +1,7 @@
 package com.temporaryteam.noticeditor.view.selector;
 
+import com.temporaryteam.noticeditor.io.FileIO;
+import com.temporaryteam.noticeditor.io.IO;
 import java.io.File;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
@@ -50,8 +52,14 @@ public abstract class FileSelectorDialog implements SelectorDialog {
 		return selectedFile;
 	}
 	
+	@Override
+	public IO io() {
+		return new FileIO(selectedFile);
+	}
+	
 	/**
 	 * Returns filter list
+	 * 
 	 * @return Filter list
 	 */
 	public ObservableList<ExtensionFilter> getExtensionFilters() {
@@ -94,7 +102,7 @@ public abstract class FileSelectorDialog implements SelectorDialog {
 		File lastDir = SelectorDialogService.getLastDirectory();
 		boolean hasLastDir = lastDir != null  && lastDir.exists() && lastDir.isDirectory();
 		if (hasLastDir) {
-			setInitialDirectory(selectedFile);
+			setInitialDirectory(lastDir);
 		}
 		
 		return this;

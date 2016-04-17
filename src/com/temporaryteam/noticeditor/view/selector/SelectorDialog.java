@@ -1,6 +1,7 @@
 package com.temporaryteam.noticeditor.view.selector;
 
 import java.io.File;
+import com.temporaryteam.noticeditor.io.IO;
 
 /**
  * Interface of selector
@@ -32,6 +33,15 @@ public interface SelectorDialog {
 	 * Returns selected file
 	 * 
 	 * @return Selected file
+	 * @deprecated Use <code>io</code>
 	 */
 	File result();
+	
+	/**
+	 * Returns containered datasource
+	 * 
+	 * @return IO container
+	 */
+	IO io();
+	
 }
