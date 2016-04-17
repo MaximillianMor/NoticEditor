@@ -79,10 +79,12 @@ public class ZipWithIndexFormat implements Format {
 		String path = aPath + dirPrefix + filename;
 		// solve collision
 		if (paths.contains(path)) {
+			String newFilename = filename;
 			for (int i = 0; paths.contains(path); i++) {
-				filename = String.format("%s_(%d)", filename, i);
-				path = aPath + dirPrefix + filename;
+				newFilename = String.format("%s_(%d)", filename, i);
+				path = aPath + dirPrefix + newFilename;
 			}
+			filename = newFilename;
 		}
 		paths.add(path);
 		
