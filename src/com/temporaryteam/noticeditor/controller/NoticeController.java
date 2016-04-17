@@ -32,19 +32,19 @@ import javafx.stage.WindowEvent;
 /**
  * Main window controller
  * View: fxml/Main.fxml
- * 
- * MUST set primary stage before using?
  */
 public class NoticeController {
 
 	private static final Logger LOGGER = Logger.getLogger(NoticeController.class.getName());
 
 	@FXML
-	private VBox noticeTreeView;
-
+	private ResourceBundle resources;
+	
 	@FXML
-	private NoticeTreeViewController noticeTreeViewController;
-
+	private VBox noticeTreeView;
+	
+	@FXML
+	private SplitPane noticeView;
 
 	@FXML
 	private CheckMenuItem wordWrapItem;
@@ -53,20 +53,18 @@ public class NoticeController {
 	private Menu recentFilesMenu, previewStyleMenu;
 	
 	@FXML
-	private SplitPane noticeView;
-
-	@FXML
-	private NoticeViewController noticeViewController;
-
-	@FXML
 	private VBox notificationBox;
 	
 	@FXML
 	private Label notificationLabel;
 	
 	@FXML
-	private ResourceBundle resources;
+	private NoticeTreeViewController noticeTreeViewController;
 
+	@FXML
+	private NoticeViewController noticeViewController;
+	
+	
 	private static NoticeController instance;
 	private Stage primaryStage;
 	
@@ -124,7 +122,14 @@ public class NoticeController {
 		}
 		rebuildRecentFilesMenu();
 				
-		// Set preview styles menu items
+		fillPreviewStyleMenu();
+
+		noticeViewController.getEditor().wrapTextProperty().bind(wordWrapItem.selectedProperty());
+		noticeTreeViewController.rebuildTree(resources.getString("help"));
+	}
+
+	// Set preview styles menu items
+	private void fillPreviewStyleMenu() {
 		ToggleGroup previewStyleGroup = new ToggleGroup();
 		for (PreviewStyles style : PreviewStyles.values()) {
 			final String cssPath = style.getCssPath();
@@ -137,9 +142,6 @@ public class NoticeController {
 			item.setOnAction(noticeViewController.onPreviewStyleChange);
 			previewStyleMenu.getItems().add(item);
 		}
-
-		noticeViewController.getEditor().wrapTextProperty().bind(wordWrapItem.selectedProperty());
-		noticeTreeViewController.rebuildTree(resources.getString("help"));
 	}
 	
 	private void rebuildRecentFilesMenu() {
@@ -170,7 +172,6 @@ public class NoticeController {
 	@FXML
 	private void handleOpen(ActionEvent event) {
 		fileSaved = SelectorDialogService.get(FileLoaderDialog.class)
-//		fileSaved = SelectorDialogService.fileLoader()
 			.filter(FileSelectorDialog.SUPPORTED, FileSelectorDialog.ALL)
 			.show("Open notice")
 			.result();
@@ -203,7 +204,6 @@ public class NoticeController {
 	@FXML
 	private void handleSaveAs(ActionEvent event) {
 		fileSaved = SelectorDialogService.get(FileSaverDialog.class)
-//		fileSaved = SelectorDialogService.fileSaver()
 			.filter(FileSelectorDialog.ZIP, FileSelectorDialog.JSON)
 			.show("Save notice")
 			.result();
@@ -219,7 +219,6 @@ public class NoticeController {
 		boolean isJson = 
 			SelectorDialogService.get(FileSaverDialog.class)
 				.getLastExtension().equals(FileSelectorDialog.JSON)
-//			SelectorDialogService.fileSaver().getLastExtension().equals(FileSelectorDialog.JSON)
 			|| file.getName().toLowerCase().endsWith(".json");
 		if (isJson) {
 			strategy = ExportStrategyHolder.JSON;
@@ -240,7 +239,6 @@ public class NoticeController {
 	@FXML
 	private void handleExportHtml(ActionEvent event) {
 		File destDir = SelectorDialogService.get(DirectorySelectorDialog.class)
-//		File destDir = SelectorDialogService.directorySelector()
 			.show("Select directory to save HTML files")
 			.result();
 		if (destDir == null) {
@@ -304,7 +302,6 @@ public class NoticeController {
 	@FXML
 	private void handleImportFile(ActionEvent event) {
 		File file = SelectorDialogService.get(FileLoaderDialog.class)
-//		File file = SelectorDialogService.fileLoader()
 			.filter(FileSelectorDialog.SUPPORTED, FileSelectorDialog.ALL)
 			.show("Import file")
 			.result();
@@ -320,6 +317,11 @@ public class NoticeController {
 	}
 
 	public void onExit(WindowEvent we) {
-		Prefs.setLastDirectory(SelectorDialogService.getLastDirectory().getAbsolutePath());
+		File lastDir = SelectorDialogService.getLastDirectory();
+		if (lastDir == null) {
+			return;
+		}
+		
+		Prefs.setLastDirectory(lastDir.getAbsolutePath());
 	}
 }

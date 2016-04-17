@@ -23,14 +23,14 @@ public class Main extends Application {
 		initRootLayout(primaryStage);
 	}
 	
+	/**
+	 * Registers selectors (file and directory)
+	 * @param primaryStage 
+	 */
 	private void registerSelectors(final Window primaryStage) {
 		SelectorDialogService.register(new DirectorySelectorDialog(primaryStage));
 		SelectorDialogService.register(new FileLoaderDialog(primaryStage));
 		SelectorDialogService.register(new FileSaverDialog(primaryStage));
-		
-//		SelectorDialogService.setDirectorySelector(new DirectorySelectorDialog(primaryStage));
-//		SelectorDialogService.fileLoader(new FileLoaderDialog(primaryStage));
-//		SelectorDialogService.fileSaver(new FileSaverDialog(primaryStage));
 	}
 	
 	/**

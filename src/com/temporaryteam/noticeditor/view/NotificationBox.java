@@ -41,7 +41,7 @@ public class NotificationBox implements Notifiable {
 		
 		transitionOut = new TranslateTransition(TRANSITION_DURATION, notificationBox);
 		transitionOut.setFromY(0);
-		transitionOut.setOnFinished((e) -> notificationBox.setVisible(true));
+		transitionOut.setOnFinished((e) -> notificationBox.setVisible(false));
 	}
 	
 	/**

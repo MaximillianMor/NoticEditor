@@ -69,6 +69,7 @@ public class SelectorDialogService {
 	 * @param initialDirectory Directory
 	 */
 	public static void setInitialDirectory(final File initialDirectory) {
+		setLastDirectory(initialDirectory);
 		for (SelectorDialog selector : services.values()) {
 			selector.setInitialDirectory(lastDirectory);
 		}
