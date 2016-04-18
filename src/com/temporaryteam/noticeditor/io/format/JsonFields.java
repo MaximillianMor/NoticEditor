@@ -32,4 +32,12 @@ public class JsonFields {
 	 * Status list
 	 */
 	public static final String KEY_STATUSINFO = "statusInfo";
+	/**
+	 * Status name
+	 */
+	public static final String KEY_STATUSNAME = "name";
+	/**
+	 * Status code
+	 */
+	public static final String KEY_STATUSCODE = "code";
 }

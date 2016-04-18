@@ -1,15 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.temporaryteam.noticeditor.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 
 /**
@@ -56,7 +54,13 @@ public class ZipFileIO extends FileIO {
 
 	@Override
 	public String read() throws IOException {
-		return super.read();
+		try {
+			FileHeader header = zipFile.getFileHeader(operationPath);
+			if (header == null) return "";
+			return stringFromStream(zipFile.getInputStream(header));
+		} catch (ZipException ex) {
+			throw new IOException(ex.getMessage(), ex.getCause());
+		}
 	}
 	
 }

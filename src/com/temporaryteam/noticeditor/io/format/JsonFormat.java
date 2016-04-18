@@ -3,6 +3,7 @@ package com.temporaryteam.noticeditor.io.format;
 import com.temporaryteam.noticeditor.io.IO;
 import static com.temporaryteam.noticeditor.io.format.JsonFields.*;
 import com.temporaryteam.noticeditor.model.NoticeItem;
+import com.temporaryteam.noticeditor.model.NoticeStatusList;
 import com.temporaryteam.noticeditor.model.NoticeTree;
 import com.temporaryteam.noticeditor.model.NoticeTreeItem;
 import java.io.IOException;
@@ -25,19 +26,19 @@ public class JsonFormat implements Format {
 			JSONObject json = new JSONObject(content);
 			
 			if (json.has(KEY_STATUSINFO)) {
-				// TODO: refactorNoticeList
-				//	JSONArray statusList = json.getJSONArray(KEY_STATUSINFO);
-				//	if (statusList.length() > 0) {
-				//		NoticeStatusList.clear();
-				//	}
-				//	for (int i = 0; i < statusList.length(); i++) {
-				//		JSONObject obj = (JSONObject) statusList.get(i);
-				//		String name = obj.getString("name");
-				//		int code = obj.getInt("code");
-				//		NoticeStatusList.add(name, code);
-				//	}
+				JSONArray statusList = json.getJSONArray(KEY_STATUSINFO);
+				if (statusList.length() > 0) {
+					NoticeStatusList.clear();
+				}
+				
+				for (int i = 0; i < statusList.length(); i++) {
+					JSONObject obj = (JSONObject) statusList.get(i);
+					String name = obj.getString(KEY_STATUSNAME);
+					int code = obj.getInt(KEY_STATUSCODE);
+					NoticeStatusList.add(name, code);
+				}
 			} else {
-				// TODO: setDefaultNoticeList
+				NoticeStatusList.restore();
 			}
 			
 			return new NoticeTree(jsonToTree(json));
@@ -71,7 +72,7 @@ public class JsonFormat implements Format {
 		try {
 			// if (file.exists()) file.delete() ???
 			JSONObject json = treeToJson(tree.getRoot());
-			// TODO: status codes
+			json.put(KEY_STATUSINFO, NoticeStatusList.asObservable());
 			
 			destination.write(json.toString());
 		} catch (JSONException ex) {

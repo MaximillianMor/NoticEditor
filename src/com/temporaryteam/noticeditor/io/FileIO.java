@@ -36,7 +36,7 @@ public class FileIO implements IO {
 	 * @return Stream content
 	 * @throws IOException 
 	 */
-	private static String stringFromStream(InputStream stream) throws IOException {
+	protected String stringFromStream(InputStream stream) throws IOException {
 		return stringFromStream(stream, "UTF-8");
 	}
 	
@@ -47,7 +47,7 @@ public class FileIO implements IO {
 	 * @return Stream charset
 	 * @throws IOException 
 	 */
-	private static String stringFromStream(InputStream stream, String charset) throws IOException {
+	protected String stringFromStream(InputStream stream, String charset) throws IOException {
 		final StringBuilder result = new StringBuilder();
 		try (Reader isr = new InputStreamReader(stream, charset);
 				BufferedReader reader = new BufferedReader(isr)) {

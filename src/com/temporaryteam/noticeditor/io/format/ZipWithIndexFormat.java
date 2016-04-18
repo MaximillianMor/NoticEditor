@@ -1,17 +1,19 @@
 package com.temporaryteam.noticeditor.io.format;
 
-
 import com.temporaryteam.noticeditor.io.FileIO;
 import com.temporaryteam.noticeditor.io.IO;
 import com.temporaryteam.noticeditor.io.IOUtil;
 import com.temporaryteam.noticeditor.io.ZipFileIO;
 import com.temporaryteam.noticeditor.model.NoticeItem;
+import com.temporaryteam.noticeditor.model.NoticeStatusList;
 import com.temporaryteam.noticeditor.model.NoticeTree;
 import com.temporaryteam.noticeditor.model.NoticeTreeItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.TreeItem;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
@@ -35,9 +37,62 @@ public class ZipWithIndexFormat implements Format {
 	
 	@Override
 	public NoticeTree load(IO aSource) throws FormatException, IOException {
-		return new NoticeTree();
+		try {
+			FileIO file = (FileIO) aSource;
+			ZipFileIO zip = new ZipFileIO(file.getFile());
+
+			zip.setOperationPath(INDEX_JSON);
+			String indexContent = zip.read();
+			if (indexContent == null || indexContent.isEmpty()) {
+				throw new FormatException("Invalid file format. Can not find index.json");
+			}
+			JSONObject index = new JSONObject(indexContent);
+			
+			if (index.has(JsonFields.KEY_STATUSINFO)) {
+				JSONArray statusList = index.getJSONArray(JsonFields.KEY_STATUSINFO);
+				if (statusList.length() > 0) {
+					NoticeStatusList.clear();
+				}
+				for (int i = 0; i < statusList.length(); i++) {
+					JSONObject obj = (JSONObject) statusList.get(i);
+					String name = obj.getString(JsonFields.KEY_STATUSNAME);
+					int code = obj.getInt(JsonFields.KEY_STATUSCODE);
+					NoticeStatusList.add(name, code);
+				}
+			} else {
+				NoticeStatusList.restore();
+			}
+			
+			NoticeTreeItem root = loadFromZip(zip, "", index);
+			return new NoticeTree(root);
+		} catch (ClassCastException | JSONException | ZipException ex) {
+			throw new FormatException(ex.getCause());
+		} 
 	}
 
+	private NoticeTreeItem loadFromZip(ZipFileIO aZip, String aPath, JSONObject aIndex) 
+		throws IOException, JSONException, ZipException {
+		
+		final String title = aIndex.getString(JsonFields.KEY_TITLE);
+		final String filename = aIndex.getString(JsonFields.KEY_FILENAME);
+		final int status = aIndex.optInt(JsonFields.KEY_STATUS, NoticeItem.STATUS_NORMAL);
+		final String dirPrefix = aIndex.has(JsonFields.KEY_CHILDREN) ? BRANCH_PREFIX : NOTE_PREFIX;
+		
+		final String newDir = aPath + dirPrefix + filename + "/";
+		if (aIndex.has(JsonFields.KEY_CHILDREN)) {
+			JSONArray children = aIndex.getJSONArray(JsonFields.KEY_CHILDREN);
+			NoticeTreeItem branch = new NoticeTreeItem(title);
+			for (int i = 0; i < children.length(); i++) {
+				branch.addChild(loadFromZip(aZip, newDir, children.getJSONObject(i)));
+			}
+			return branch;
+		} else {
+			final String mdPath = newDir + filename + ".md";
+			aZip.setOperationPath(mdPath);
+			return new NoticeTreeItem(title, aZip.read(), status);
+		}
+	}
+	
 	@Override
 	public void save(IO aDestination, NoticeTree aTree) throws FormatException, IOException {
 		try {
@@ -53,6 +108,8 @@ public class ZipWithIndexFormat implements Format {
 			zip.setParameters(parameters);
 
 			JSONObject index = new JSONObject();
+			index.put(JsonFields.KEY_STATUSINFO, NoticeStatusList.asObservable());
+			
 			saveToZip(zip, "", aTree.getRoot(), index);
 			zip.setOperationPath(INDEX_JSON);
 			zip.write(index.toString());
