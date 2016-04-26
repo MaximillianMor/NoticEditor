@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.temporaryteam.noticeditor.io.format;
 
 import com.temporaryteam.noticeditor.io.StubIO;
@@ -23,7 +18,7 @@ public class JsonFormatTest {
 			JsonFormat fmt = new JsonFormat();
 			
 			String jsonStr =
-					"{\"children\":"
+					"{\"statusInfo\":[],\"children\":"
 					+ "[{\"children\":[],\"title\":\"Default notice\",\"content\":\"hkg\",\"status\":0}],"
 					+ "\"title\":\"Root\"}";
 			StubIO stub = new StubIO(jsonStr);

@@ -18,6 +18,9 @@ public class NoticeStatusList {
 	static {
 		list = new ArrayList<>();
 		lastIndex = -1;
+		
+		mementoList = new ArrayList<>();
+		mementoLastIndex = -1;
 	}
 	
 	/**
